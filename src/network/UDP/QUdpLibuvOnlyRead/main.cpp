@@ -4,6 +4,7 @@
 #include "UvUdpSocket.h"
 #include <unistd.h>
 using namespace shuimo;
+
 int main(int argc, char *argv[])
 {
     qDebug() << "main thread tid:" << getpid();
@@ -12,7 +13,7 @@ int main(int argc, char *argv[])
     //create socket
     UvUdpSocket socket("192.168.1.3", 9001);
     auto recvCb = [](const QString &addr, quint16 port, const QByteArray &data) {
-        qDebug() << QString("recv %1:%2").arg(addr).arg(port) << data.toHex(' ');
+        qDebug() << QString("recv %1:%2 %3bytes").arg(addr).arg(port).arg(data.size());
     };
     QObject::connect(&socket, &UvUdpSocket::dataReceived, recvCb);
 

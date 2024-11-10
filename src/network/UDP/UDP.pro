@@ -1,4 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-	QUdpLibuvOnlyRead
+	QUdpLibuvOnlyRead \
+	QUdpSocketTest \
+	SendMuchData

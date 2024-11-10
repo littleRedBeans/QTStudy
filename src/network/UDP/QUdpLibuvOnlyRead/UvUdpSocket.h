@@ -21,9 +21,9 @@ signals:
 
 private:
     void closeSocket();
-    void on_udp_read(uv_udp_t *req, ssize_t nread, const uv_buf_t *buf, const struct sockaddr *addr);
-    static void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf);
-    static void on_udp_read_static(
+    void onUdpRead(uv_udp_t *req, ssize_t nread, const uv_buf_t *buf, const struct sockaddr *addr);
+    static void allocBuffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf);
+    static void onUdpReadStatic(
         uv_udp_s *req, long nread, const uv_buf_t *buf, const sockaddr *addr, unsigned int flags);
     Q_DISABLE_COPY(UvUdpSocket) //noncopyable UvUdpSocket
     const QString ip_;
