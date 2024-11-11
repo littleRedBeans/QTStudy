@@ -65,9 +65,10 @@ void UvUdpSocket::sendDataPrivate(const QByteArray &data, const QString &address
     context->uv_buf.base = context->buffer;
     context->uv_buf.len = data.size();
 
-    // 创建发送请求
+    // create uv_udp_send_t
     auto *send_req = new uv_udp_send_t;
-    send_req->data = context; // 将上下文保存到请求中
+    // save context into send_req
+    send_req->data = context;
 
     int r = uv_udp_send(send_req,
                         udp_socket_.get(),
@@ -77,7 +78,7 @@ void UvUdpSocket::sendDataPrivate(const QByteArray &data, const QString &address
                         onSendComplete);
     if (r) {
         qDebug() << "Failed to send UDP data: " << uv_strerror(r);
-        // 清理资源
+        // delete context
         delete[] context->buffer;
         delete context;
         delete send_req;
@@ -85,13 +86,13 @@ void UvUdpSocket::sendDataPrivate(const QByteArray &data, const QString &address
 }
 void UvUdpSocket::onSendComplete(uv_udp_send_t *req, int status)
 {
-    // 获取发送上下文
+    // get context
     auto *context = static_cast<SendContext *>(req->data);
 
     if (status < 0) {
         qDebug() << "Send failed:" << uv_strerror(status);
     }
-    // 清理资源
+    // delete context
     delete[] context->buffer;
     delete context;
     delete req;
