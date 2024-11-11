@@ -17,5 +17,6 @@ In windows,you can download libuv source code to bulid from github.
 | --- | --- | --- | --- |
 |QUdpLibuvOnlyRead|src/network/UDP|Based on the QT framework, call libuv in a child thread to efficiently receive UDP data.|only for read，can not send，see[https://zhuanlan.zhihu.com/p/5998483091](https://zhuanlan.zhihu.com/p/5998483091)|
 |QUdpSocketTest SendMuchData|src/network/UDP|for compare with QUdpLibuvOnlyRead|QUdpSocketTest program recv data，SendMuchData program send data to QUdpSocketTest and QUdpLibuvOnlyRead|
+| QUdpLibuvInefficient | src/network/UDP | Based on the QT framework, call libuv in a child thread to receive and send UDP data | receive data is slower than QUdpLibuvOnlyRead，but faster than QUdpSocket|
 # Excute
 after build code，all excutable files will create in /bin dir.
