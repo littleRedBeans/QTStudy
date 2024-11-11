@@ -13,7 +13,6 @@ class UvUdpSocket : public QObject
 public:
     explicit UvUdpSocket(const QString &ip, quint16 port, QObject *parent = nullptr);
     ~UvUdpSocket();
-    //not thread safe
     void sendData(const QByteArray &data, const QString &address, quint16 port);
 public slots:
     void initSocket();
