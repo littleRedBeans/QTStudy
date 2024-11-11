@@ -1,6 +1,7 @@
 #include "UvUdpSocket.h"
 #include <QDebug>
 #include <QThread>
+#include <QTimer>
 #include <unistd.h>
 using namespace shuimo;
 using namespace std;
@@ -11,6 +12,7 @@ UvUdpSocket::UvUdpSocket(const QString &ip, quint16 port, QObject *parent)
     : QObject(parent)
     , ip_(ip)
     , port_(port)
+    , start_(false)
 {}
 
 UvUdpSocket::~UvUdpSocket()
@@ -21,6 +23,8 @@ UvUdpSocket::~UvUdpSocket()
 
 void UvUdpSocket::initSocket()
 {
+    assert(false == start_);
+    start_ = true;
     //create uv_loop_t uv_udp_t
     loop_.reset(uv_loop_new());
     udp_socket_ = make_shared<uv_udp_t>();
@@ -43,11 +47,14 @@ void UvUdpSocket::initSocket()
         qDebug() << "Failed to start UDP socket: " << uv_strerror(r);
     }
 
-    uv_run(loop_.get(), UV_RUN_DEFAULT);
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]() { uv_run(loop_.get(), UV_RUN_NOWAIT); });
+    timer->start(0);
 }
 
-void UvUdpSocket::sendData(const QByteArray &data, const QString &address, quint16 port)
+void UvUdpSocket::sendDataPrivate(const QByteArray &data, const QString &address, quint16 port)
 {
+    qDebug() << "flag1";
     struct sockaddr_in addr;
     uv_ip4_addr(address.toStdString().c_str(), port, &addr);
 
@@ -89,6 +96,15 @@ void UvUdpSocket::onSendComplete(uv_udp_send_t *req, int status)
     delete context;
     delete req;
 }
+void UvUdpSocket::sendData(const QByteArray &data, const QString &address, quint16 port)
+{
+    QMetaObject::invokeMethod(this,
+                              "sendDataPrivate",
+                              Q_ARG(const QByteArray &, data),
+                              Q_ARG(const QString &, address),
+                              Q_ARG(quint16, port));
+}
+
 void UvUdpSocket::closeSocket()
 {
     uv_udp_recv_stop(udp_socket_.get());

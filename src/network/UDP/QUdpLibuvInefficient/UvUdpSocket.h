@@ -1,8 +1,9 @@
 #ifndef UVUDPSOCKET_H
 #define UVUDPSOCKET_H
-///this code is demo for use libuv in QT
-/// can only use libuv read in child thread
+/// this code is demo for use libuv in QT
+/// can send and recv udp data
 #include <QObject>
+#include <atomic>
 #include <memory>
 #include <uv.h>
 namespace shuimo {
@@ -16,6 +17,8 @@ public:
     void sendData(const QByteArray &data, const QString &address, quint16 port);
 public slots:
     void initSocket();
+private slots:
+    void sendDataPrivate(const QByteArray &data, const QString &address, quint16 port);
 signals:
     void dataReceived(const QString &addr, quint16 port, const QByteArray &data);
 
@@ -34,6 +37,7 @@ private:
     Q_DISABLE_COPY(UvUdpSocket) //noncopyable UvUdpSocket
     const QString ip_;
     const quint16 port_;
+    std::atomic_bool start_;
     std::shared_ptr<uv_loop_t> loop_;
     std::shared_ptr<uv_udp_t> udp_socket_;
 };
