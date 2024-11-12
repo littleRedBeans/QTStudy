@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
+#include <EventDispatcherLibUv.h>
 #include <unistd.h>
 using namespace shuimo;
 using namespace std;
@@ -18,7 +19,7 @@ UvUdpSocket::UvUdpSocket(const QString &ip, quint16 port, QObject *parent)
 UvUdpSocket::~UvUdpSocket()
 {
     closeSocket();
-    uv_loop_close(loop_.get());
+    uv_loop_close(loop_);
 }
 
 void UvUdpSocket::initSocket()
@@ -26,14 +27,16 @@ void UvUdpSocket::initSocket()
     assert(false == start_);
     start_ = true;
     //create uv_loop_t uv_udp_t
-    loop_.reset(uv_loop_new());
+    EventDispatcherLibUv *dispatcher = static_cast<EventDispatcherLibUv *>(
+        QAbstractEventDispatcher::instance());
+    loop_ = dispatcher->uvLoop();
     udp_socket_ = make_shared<uv_udp_t>();
 
     //set context UvUdpSocket pointer to udp_socket_
     uv_handle_set_data((uv_handle_t *) udp_socket_.get(), this);
 
     //bind to Ip:port
-    uv_udp_init(loop_.get(), udp_socket_.get());
+    uv_udp_init(loop_, udp_socket_.get());
     struct sockaddr_in addr;
     uv_ip4_addr(ip_.toStdString().c_str(), port_, &addr);
 
@@ -46,10 +49,6 @@ void UvUdpSocket::initSocket()
     if (r) {
         qDebug() << "Failed to start UDP socket: " << uv_strerror(r);
     }
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this]() { uv_run(loop_.get(), UV_RUN_NOWAIT); });
-    timer->start(0);
 }
 
 void UvUdpSocket::sendDataPrivate(const QByteArray &data, const QString &address, quint16 port)

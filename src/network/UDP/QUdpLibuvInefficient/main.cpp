@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 
     //move to child thread
     QThread thread;
+    thread.setObjectName("networkThread");
     socket.moveToThread(&thread);
     thread.start();
 

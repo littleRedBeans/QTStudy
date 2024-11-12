@@ -2,12 +2,13 @@
 #include <QThread>
 #include <QTimer>
 #include "UvUdpSocket.h"
+#include <EventDispatcherLibUv.h>
 #include <unistd.h>
 using namespace shuimo;
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "main thread tid:" << getpid();
+    qDebug() << "QUdpLibuvInefficient main thread tid:" << getpid();
     QCoreApplication a(argc, argv);
 
     //create socket
@@ -20,16 +21,15 @@ int main(int argc, char *argv[])
     //move to child thread
     QThread thread;
     thread.setObjectName("networkThread");
+    thread.setEventDispatcher(new EventDispatcherLibUv);
     socket.moveToThread(&thread);
     thread.start();
 
     //excute initSocket() in child thread
     QTimer::singleShot(0, &socket, &UvUdpSocket::initSocket);
 
-    //wait 500ms to ensure that the initSocket function has been completed
-    QThread::msleep(500);
+    //send data
     QString message("hello world");
-    //not thread safe to excute sendData
     socket.sendData(message.toLocal8Bit(), "192.168.1.6", 8080);
 
     return a.exec();

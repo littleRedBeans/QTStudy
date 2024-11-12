@@ -1,0 +1,13 @@
+prefix=/home/cwj/qt/6.5.1/gcc_64
+exec_prefix=${prefix}
+libdir=/usr/lib
+includedir=/usr/include
+
+
+Name: eventdispatcher_libuv
+Description: LibUv-based event dispatcher for Qt
+Version: 1.0.0
+Libs: -leventdispatcher_libuv 
+Libs.private: -luv -ldl -lrt /home/cwj/qt/6.5.1/gcc_64/lib/libQt6Core.so -lpthread    
+Cflags: 
+
