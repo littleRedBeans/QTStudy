@@ -19,7 +19,6 @@ UvUdpSocket::UvUdpSocket(const QString &ip, quint16 port, QObject *parent)
 UvUdpSocket::~UvUdpSocket()
 {
     closeSocket();
-    uv_loop_close(loop_);
 }
 
 void UvUdpSocket::initSocket()
@@ -29,14 +28,14 @@ void UvUdpSocket::initSocket()
     //create uv_loop_t uv_udp_t
     EventDispatcherLibUv *dispatcher = static_cast<EventDispatcherLibUv *>(
         QAbstractEventDispatcher::instance());
-    loop_ = dispatcher->uvLoop();
+    uv_loop_t *loop = dispatcher->uvLoop();
     udp_socket_ = make_shared<uv_udp_t>();
 
     //set context UvUdpSocket pointer to udp_socket_
     uv_handle_set_data((uv_handle_t *) udp_socket_.get(), this);
 
     //bind to Ip:port
-    uv_udp_init(loop_, udp_socket_.get());
+    uv_udp_init(loop, udp_socket_.get());
     struct sockaddr_in addr;
     uv_ip4_addr(ip_.toStdString().c_str(), port_, &addr);
 

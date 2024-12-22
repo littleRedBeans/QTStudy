@@ -38,7 +38,6 @@ private:
     const QString ip_;
     const quint16 port_;
     std::atomic_bool start_;
-    uv_loop_t *loop_;
     std::shared_ptr<uv_udp_t> udp_socket_;
 };
 } // namespace shuimo
